@@ -182,8 +182,6 @@ public class SpeedFile {
 		return updated;
 	}
 	
-	
-
 	public SpeedRecord getRawData(int index) {
 		SpeedRecord speedObj = eof;
 		if (index < maxCtr) {
