@@ -1,6 +1,5 @@
 package org.bobcat.robotics;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +10,7 @@ import org.usfirst.frc.team177.lib.SpeedRecord;
 public class RioFileManager {
 	private String fileName = null;
 	private int totRecords = 0;
+	private boolean direction = true; // true = forward false = backward 
 
 	// Make up vars for constants, and some arrays to hold data from calculations
 	private double eps = 0.000001;           // A small number to keep from dividing by zero
@@ -40,6 +40,15 @@ public class RioFileManager {
 		this();
 		this.fileName = fileName;
 	}
+
+	public void setFileName(String filename) {
+		this.fileName = filename;
+	}
+	
+	public void setDirection(boolean dir) {
+		RioLogger.debugLog("direction is " + dir);
+		direction = dir;
+	}
 	
 	public int getTotalRecords() {
 		return totRecords;
@@ -53,6 +62,7 @@ public class RioFileManager {
 		SpeedFile sFile = new SpeedFile(fileName);
 		sFile.readRecordingFile();
 		int nbrRecords = sFile.getNbrOfRows();
+		RioLogger.debugLog("reading file " + fileName);
 		RioLogger.debugLog("nbr Rows = " + nbrRecords);
 		int recCtr = 0;
 		double [][] distance = new double[nbrRecords][2];
@@ -91,7 +101,14 @@ public class RioFileManager {
 		// Set the first point by hand, then loop over the rest of the points stopping 1 before the end.
 		xx[0] = 0.0;
 		yy[0] = 0.0;
-		theta[0] = 1.571;
+		if (direction) {
+			RioLogger.debugLog("setting theta to +1.571");
+			theta[0] = 1.571;
+		}
+		else {
+			RioLogger.debugLog("setting theta to -1.571");
+			theta[0] = -1.571;
+		}
 		RobotPoint rp = new RobotPoint(xx[0],yy[0]);
 		path.add(rp);
 		nbrRecords = 1;
@@ -127,9 +144,9 @@ public class RioFileManager {
 			// Print some debugging info
 			// if ((xx[point+1] < -25.0) && (xx[point+1] > -35.0)) {
 			if (point < 100) {
-				RioLogger.debugLog("pass="+point+" lddotf="+lddotf[point]+" rddotf="+rddotf[point]+" theta="+theta[point]+" iccx="+xx[point]+" iccy="+iccy[point]+" xx="+xx[point+1] + " yy="+yy[point+1]);
+				//RioLogger.debugLog("pass="+point+" lddotf="+lddotf[point]+" rddotf="+rddotf[point]+" theta="+theta[point]+" iccx="+xx[point]+" iccy="+iccy[point]+" xx="+xx[point+1] + " yy="+yy[point+1]);
 			}
-//			if (point < 50) {
+//			if (point < 56) {
 				rp = new RobotPoint(xx[point+1],yy[point+1]);
 				path.add(rp);
 				nbrRecords++;
@@ -148,7 +165,8 @@ public class RioFileManager {
 		R[recCtr] = R[recCtr-1];
 		iccx[recCtr] = iccx[recCtr-1];
 		iccy[recCtr] = iccy[recCtr-1];
-		RioLogger.debugLog(xMin + ", " + xMax + ", " + yMin + ", " + yMax);
+		RioLogger.debugLog("xMin, xMax " + xMin + ", " + xMax);
+		RioLogger.debugLog("yMin, yMax " + yMin + ", " + yMax);
 		RioLogger.debugLog("tot recs " + nbrRecords);
 		totRecords = path.size();
 		return path;

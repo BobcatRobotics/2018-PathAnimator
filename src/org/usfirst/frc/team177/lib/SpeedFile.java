@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -61,6 +62,7 @@ public class SpeedFile {
 			printWriter.println(eof.toString());
 			printWriter.flush();
 			printWriter.close();
+			fileWriter.close();
 		} catch (IOException e) {
 			String err = "SpeedFile.stopRecoring() error " + e.getMessage();
 			//DriverStation.reportError(err, false);
@@ -90,15 +92,97 @@ public class SpeedFile {
 				//RioLogger.debugLog("added record " + passCtr + " " +speedObj.toString());
 				passCtr++;
 			}
+			sc.close();
 			maxCtr = passCtr;
 			RioLogger.debugLog("maxCtr = " + maxCtr);
 			// File was read, now prime the passCounter for reading back each row
 			passCtr = 0;
 		} catch (FileNotFoundException e) {
-			String err = "SpeedFile.readRecoring() error " + e.getMessage();
+			String err = "SpeedFile.readRecoring() error " + e;
 			RioLogger.debugLog(err);
 		}
 	}
+	
+	public boolean updateRecordingFile(String backupFileName,boolean delete,int fromRec,int toRec) {
+		RioLogger.debugLog("fromRec - toRec " + fromRec + ", " + toRec);
+		boolean updated = true;
+		File source = new File(fileName);
+		File dest =  new File(path+backupFileName);
+		   try {
+			Files.copy(source.toPath(), dest.toPath());
+		} catch (IOException e) {
+			String err = "SpeedFile.updateRecordingFile() error " + e;
+			RioLogger.debugLog(err);
+			return false;
+		}
+		   
+		// TODO :: Check delete flag
+		// TODO :: Probably want to break this up for add vs delete   
+		// Now that the file was backed up
+		// For delete figure out total time being deleted, subtract from remaining records.
+		double totalTimeFrom = 0.0;
+		double totalTimeTo = 0.0;
+		boolean deleteZeroRec = (fromRec == 0);
+		// Special condition, fromRec = 0
+		if (deleteZeroRec) {
+			SpeedRecord firstRecord = speeds.get(0);
+			totalTimeFrom = firstRecord.getElapsedTime(false);
+		} else {
+			SpeedRecord fromRecord = speeds.get(fromRec - 1);
+			totalTimeFrom = fromRecord.getElapsedTime(false);
+		}
+		totalTimeTo = speeds.get(toRec).getElapsedTime(false);
+		double subtractTime = totalTimeTo - totalTimeFrom;
+		int recCtr = 0;
+		int newRecCtr = 0;
+		boolean hitAdjust = false;
+		try {
+			File file = new File(fileName);
+			FileWriter fileWriter = new FileWriter(file);
+			PrintWriter printWriter = new PrintWriter(fileWriter);
+			for (SpeedRecord speedObj : speeds) {
+				// Special condition, fromRec = 0
+				if (deleteZeroRec) {
+					printWriter.println(speedObj.toString());
+				} 
+				if (recCtr < fromRec) {
+					printWriter.println(speedObj.toString());
+					recCtr++;
+				} else if (recCtr >= fromRec && recCtr <= toRec) {
+					if (!hitAdjust) {
+						hitAdjust = true;
+						newRecCtr = recCtr;
+					}
+					recCtr++;
+					if (deleteZeroRec) {
+						newRecCtr = recCtr;
+						deleteZeroRec = false;
+					}
+				} else {
+					if (recCtr > toRec) {
+						double newTotalTime = speedObj.getElapsedTime(false) - subtractTime;
+						printWriter.println(speedObj.toStringUpdate(newRecCtr, newTotalTime));
+						recCtr++;
+						newRecCtr++;
+					}
+				}
+			}
+			printWriter.println(eof.toString());
+			printWriter.flush();
+			printWriter.close();
+			fileWriter.close();
+		} catch (IOException e) {
+			String err = "SpeedFile.updateRecordingFile() error " + e.getMessage();
+			//DriverStation.reportError(err, false);
+			//RioLogger.log(err);
+			RioLogger.debugLog(err);
+			updated = false;
+		}
+		
+		return updated;
+	}
+	
+	
 
 	public SpeedRecord getRawData(int index) {
 		SpeedRecord speedObj = eof;

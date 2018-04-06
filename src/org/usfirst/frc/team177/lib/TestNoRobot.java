@@ -53,6 +53,9 @@ public class TestNoRobot {
 		SpeedFile sFile = new SpeedFile(filename);
 		sFile.startRecording();
 		for (int x = 0; x < NBR_TEST_RECS; x++) {
+			if (x == NBR_TEST_RECS - 1) {
+				System.out.println("Next to last");
+			}
 			sFile.addSpeed(new Double(x / NBR_TEST_RECS), new Double(x / NBR_TEST_RECS), x, -x, x+Math.PI, x-Math.PI);
 			Thread.currentThread();
 			Thread.sleep(20);

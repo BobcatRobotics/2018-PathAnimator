@@ -98,8 +98,7 @@ public class SpeedRecord {
 
 	public SpeedRecord endOfFile() {
 		id = EOF;
-		totalTime = 9999999.0; //System.currentTimeMillis  (millis)
-		//totalTime = 9999.0; //Timer.getFPGATimestamp()  (seconds)  
+		totalTime = 9999.0; // In seconds, for Timer.getFPGATimestamp() or System.getMilliseconds  
 		deltaTime = 9999.0;
 		leftPower = 999.0;
 		rightPower = 999.0;
@@ -110,12 +109,18 @@ public class SpeedRecord {
 		return this;
 	}
 
+	public String toStringUpdate(int newID,double newTotalTime) { // total time in second
+		String formatter =  "%04d %10.5f %8.5f %8.5f %8.5f %8.5f %8.5f %8.5f %8.5f";
+		String fmt = String.format(formatter,newID,newTotalTime,deltaTime,leftPower,rightPower,leftDistance,rightDistance,leftVelocity,rightVelocity);
+		return fmt;
+	}
 	@Override
 	public String toString() {   // total time in second
 		String formatter =  "%04d %10.5f %8.5f %8.5f %8.5f %8.5f %8.5f %8.5f %8.5f";
-		// double totTime = totalTime // Timer.getFPGAtimestamp()
-		double totTime = totalTime / 1000.0; // System.currentTimeMillis
-		String fmt = String.format(formatter,id,totTime,deltaTime,leftPower,rightPower,leftDistance,rightDistance,leftVelocity,rightVelocity);
+		//double totTime = totalTime // Timer.getFPGAtimestamp()
+		//double totTime = totalTime / 1000.0; // System.currentTimeMillis
+		//String fmt = String.format(formatter,id,totTime,deltaTime,leftPower,rightPower,leftDistance,rightDistance,leftVelocity,rightVelocity);
+		String fmt = String.format(formatter,id,totalTime,deltaTime,leftPower,rightPower,leftDistance,rightDistance,leftVelocity,rightVelocity);
 		return fmt;
 	}
 }
