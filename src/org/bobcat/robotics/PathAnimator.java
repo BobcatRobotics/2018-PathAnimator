@@ -38,8 +38,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class PathAnimator extends Application {
-	// private final static String fileName = "center2left.speeds.txt";
-	private final static String fileName = "right2scale.speeds.txt";
+	private final static String fileName = "center2left.speeds.txt";
+	//private final static String fileName = "right2scale.speeds.txt";
 	// private final static String fileName = "left2scale.speeds.txt";
 	// private final static String fileName = "left2scale_short_switch.speeds.txt";
 	// private final static String fileName = "leftright2scaleleft.speeds.txt";
@@ -54,7 +54,7 @@ public class PathAnimator extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
-		this.primaryStage.setTitle("Path Animator " + fileName);
+		this.primaryStage.setTitle("Path Animator - " + fileName);
 
 		initRootLayout();
 		animate();
@@ -80,7 +80,12 @@ public class PathAnimator extends Application {
 		robot.setWidth(63);
 		robot.setHeight(55);
 		robot.setFill(Color.MAROON);
-		Image img = new Image("org/bobcat/robotics/robotimg.jpg", false);
+		Image img = null;
+		if (direction) {
+			img = new Image("org/bobcat/robotics/robotimg.jpg", false);
+		} else {
+			img = new Image("org/bobcat/robotics/robotimgbackwards.jpg", false);
+		}
 		robot.setFill(new ImagePattern(img));
 
 		double xPixelsPerInch = 527.0 / 324.0;
@@ -143,7 +148,7 @@ public class PathAnimator extends Application {
 		// scene.set
 
 		// Setting title to the Stage
-		primaryStage.setTitle("Robot Path");
+		primaryStage.setTitle("Robot Path - "+ fileName );
 
 		// Adding scene to the stage
 		primaryStage.setScene(scene);
@@ -220,17 +225,17 @@ public class PathAnimator extends Application {
 		}
 	}
 
-	private String openFile(File file) {
-		String newFileName = fileName;
-		try {
-			desktop.open(file);
-			newFileName = file.getName();
-		} catch (IOException ex) {
-			RioLogger.errorLog("Error openFile() " + ex);
-			ex.printStackTrace();
-		}
-		return newFileName;
-	}
+//	private String openFile(File file) {
+//		String newFileName = fileName;
+//		try {
+//			desktop.open(file);
+//			newFileName = file.getName();
+//		} catch (IOException ex) {
+//			RioLogger.errorLog("Error openFile() " + ex);
+//			ex.printStackTrace();
+//		}
+//		return newFileName;
+//	}
 
 	private RobotPoint determineStartingPoint(String filename) {
 		RobotPoint rp = new RobotPoint();
