@@ -38,7 +38,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class PathAnimator extends Application {
-	private final static String fileName = "center2left.speeds.txt";
+	private static String fileName = "center2left.speeds.txt";
 	//private final static String fileName = "right2scale.speeds.txt";
 	// private final static String fileName = "left2scale.speeds.txt";
 	// private final static String fileName = "left2scale_short_switch.speeds.txt";
@@ -183,6 +183,7 @@ public class PathAnimator extends Application {
 					if (file != null) {
 						String newFileName = file.getName(); /* openFile(file); */
 						rioFile.setFileName(newFileName);
+						fileName = newFileName;
 						animate();
 					}
 				}
